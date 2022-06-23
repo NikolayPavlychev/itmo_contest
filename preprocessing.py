@@ -127,9 +127,26 @@ students_mark_history_train = students_mark_history_train.reset_index().rename({
 train_dataset = train_dataset.merge(students_mark_history_train,on=['DISC_ID'],how='left')
 train_dataset = train_dataset.merge(isu_mark_history_train,on=['ISU', 'TYPE_NAME'],how='left')
 
-print('target shape = ', target.shape)
-print(target.info())
+print('train target shape = ', train_dataset.shape)
+print(train_dataset.info())
 
 isu_mark_history_test = train[train['ST_YEAR'].isin(['2019'])].groupby(by=['ISU', 'TYPE_NAME'])['DEBT'].agg({'median'})
-students_mark_history_test = train[train['ST_YEAR'].isin(['2019'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','median','std'})
+students_mark_history_test = train[train['ST_YEAR'].isin(['2019'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','std'})
+isu_mark_history_test = isu_mark_history_test.reset_index().rename({'median':'debt_hist'},axis=1)
+students_mark_history_test = students_mark_history_test.reset_index().rename({'std':'students_debt_hist_std','mean':'students_debt_hist_mean'},axis=1)
+test_dataset = test_dataset.merge(students_mark_history_test,on=['DISC_ID'],how='left')
+test_dataset = test_dataset.merge(isu_mark_history_test,on=['ISU', 'TYPE_NAME'],how='left')
+
+print('test target shape = ', test_dataset.shape)
+print(test_dataset.info())
+
+train_dataset['debt_hist'] = train_dataset['debt_hist'].fillna(value=train_dataset['debt_hist'].median())
+train_dataset['students_debt_hist_std'] = train_dataset['students_debt_hist_std'].fillna(value=train_dataset['students_debt_hist_std'].mean())
+train_dataset['students_debt_hist_mean'] = train_dataset['students_debt_hist_mean'].fillna(value=train_dataset['students_debt_hist_mean'].mean())
+
+test_dataset['debt_hist'] = test_dataset['debt_hist'].fillna(value=test_dataset['debt_hist'].median())
+test_dataset['students_debt_hist_std'] = test_dataset['students_debt_hist_std'].fillna(value=test_dataset['students_debt_hist_std'].mean())
+test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'].fillna(value=test_dataset['students_debt_hist_mean'].mean())
+
+#-----------------------------------------------------------------------------------------------------------------------
 

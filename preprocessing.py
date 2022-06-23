@@ -117,8 +117,19 @@ print('comp_disc_teachers shape = ',comp_disc_teachers.shape)
 #-----------------------------------------------------------------------------------------------------------------------
 print('Preparing target...')
 
-target = train[['ISU', 'DISC_ID', 'TYPE_NAME', 'DEBT']].drop_duplicates()
-print(train.shape, target.shape)
-isu_mark_history = train.groupby(by=['ISU', 'DISC_ID'])['DEBT'].agg({'median'})
-students_mark_history_train = train[train['ST_YEAR'].isin(['2018','2019'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','median','std'})
-students_mark_history_test = train[train['ST_YEAR'].isin(['2019','2020'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','median','std'})
+train_dataset = train[train['ST_YEAR'].isin(['2018','2019'])][['ISU', 'ST_YEAR', 'DISC_ID', 'TYPE_NAME', 'DEBT']].drop_duplicates()
+test_dataset = train[train['ST_YEAR'].isin(['2019','2020'])][['ISU', 'ST_YEAR', 'DISC_ID', 'TYPE_NAME', 'DEBT']].drop_duplicates()
+
+isu_mark_history_train = train_dataset[train_dataset['ST_YEAR'].isin(['2018'])].groupby(by=['ISU', 'TYPE_NAME'])['DEBT'].agg({'median'})
+students_mark_history_train = train_dataset[train_dataset['ST_YEAR'].isin(['2018'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','std'})
+isu_mark_history_train = isu_mark_history_train.reset_index().rename({'median':'debt_hist'},axis=1)
+students_mark_history_train = students_mark_history_train.reset_index().rename({'std':'students_debt_hist_std','mean':'students_debt_hist_mean'},axis=1)
+train_dataset = train_dataset.merge(students_mark_history_train,on=['DISC_ID'],how='left')
+train_dataset = train_dataset.merge(isu_mark_history_train,on=['ISU', 'TYPE_NAME'],how='left')
+
+print('target shape = ', target.shape)
+print(target.info())
+
+isu_mark_history_test = train[train['ST_YEAR'].isin(['2019'])].groupby(by=['ISU', 'TYPE_NAME'])['DEBT'].agg({'median'})
+students_mark_history_test = train[train['ST_YEAR'].isin(['2019'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','median','std'})
+

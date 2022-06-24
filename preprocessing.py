@@ -150,3 +150,22 @@ test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+rint('comp_disc_teachers table:')
+print('Check duplicates by DISC_ID:')
+print(comp_disc_teachers['DISC_ID'].unique().shape[0]/comp_disc_teachers.drop_duplicates().shape[0])
+
+comp_disc_teachers_552619236026332123 = comp_disc_teachers[comp_disc_teachers['DISC_ID']=='552619236026332123']
+
+comp_disc_teachers = comp_disc_teachers[['DISC_ID', 'CHOICE', 'DISC_NAME',
+                                           'KEYWORD_NAMES', 'GENDER', 'DATE_BIRTH',
+                                           'TYPE_NAME', 'MARK']]
+
+comp_disc_popularity = comp_disc_teachers.groupby(by=
+                                                  ['DISC_ID', 'TYPE_NAME'])[['CHOICE', 'DISC_NAME',
+                                                                             'KEYWORD_NAMES', 'GENDER', 'DATE_BIRTH',
+                                                                              'MARK']].agg({'CHOICE':'count',
+                                                                                            'DISC_NAME':'max',
+                                                                                            'KEYWORD_NAMES':'max',
+                                                                                            'GENDER':'max',
+                                                                                            'DATE_BIRTH':'max',
+                                                                                            'MARK':['std','mean']})

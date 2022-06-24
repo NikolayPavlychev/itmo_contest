@@ -83,8 +83,8 @@ print(' Full students ISU:',comp_portrait.shape[0],'\n',
 print('Check duplicates:')
 print(comp_portrait.shape[0]/comp_portrait.drop_duplicates().shape[0])
 
-comp_portrait_students = comp_portrait.merge(comp_students,on=['ISU'],how='outer')
-print('comp_portrait_students shape = ',comp_portrait_students.shape)
+# comp_portrait_students = comp_portrait.merge(comp_students,on=['ISU'],how='outer')
+# print('comp_portrait_students shape = ',comp_portrait_students.shape)
 
 print('comp_marks table:')
 print(' Full students ISU:',comp_marks.shape[0],'\n',
@@ -148,22 +148,20 @@ test_dataset['debt_hist'] = test_dataset['debt_hist'].fillna(value=test_dataset[
 test_dataset['students_debt_hist_std'] = test_dataset['students_debt_hist_std'].fillna(value=test_dataset['students_debt_hist_std'].mean())
 test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'].fillna(value=test_dataset['students_debt_hist_mean'].mean())
 
-#-----------------------------------------------------------------------------------------------------------------------
-
 print('comp_disc_teachers table:')
 print('Check duplicates by DISC_ID:')
 print(comp_disc_teachers['DISC_ID'].unique().shape[0]/comp_disc_teachers.drop_duplicates().shape[0])
 
 comp_disc_teachers_552619236026332123 = comp_disc_teachers[comp_disc_teachers['DISC_ID']=='552619236026332123']
 
-comp_disc_teachers = comp_disc_teachers[['DISC_ID', 'CHOICE', 'DISC_NAME',
+comp_disc_teachers = comp_disc_teachers[['DISC_ID', 'ST_YEAR', 'CHOICE', 'DISC_NAME',
                                            'KEYWORD_NAMES', 'GENDER', 'DATE_BIRTH',
                                            'TYPE_NAME', 'MARK']]
 comp_disc_teachers = comp_disc_teachers.dropna()
 print(comp_disc_teachers.dtypes)
 
 comp_disc_popularity = comp_disc_teachers.groupby(by=
-                                                  ['DISC_ID', 'TYPE_NAME'])[['CHOICE', 'DISC_NAME',
+                                                  ['DISC_ID', 'TYPE_NAME', 'ST_YEAR'])[['CHOICE', 'DISC_NAME',
                                                                              'KEYWORD_NAMES', 'GENDER', 'DATE_BIRTH',
                                                                               'MARK']].agg({'CHOICE':'count',
                                                                                             'DISC_NAME':'max',
@@ -174,8 +172,38 @@ comp_disc_popularity = comp_disc_teachers.groupby(by=
 
 comp_disc_popularity = comp_disc_popularity.reset_index()
 comp_disc_popularity.columns = comp_disc_popularity.columns.droplevel(1)
-comp_disc_popularity.columns.values[8] = "MARK_MEAN"
-comp_disc_popularity.columns.values[7] = "MARK_STD"
+comp_disc_popularity.columns.values[9] = "MARK_MEAN"
+comp_disc_popularity.columns.values[8] = "MARK_STD"
 
 comp_disc_popularity['MARK_STD'] = comp_disc_popularity['MARK_STD'].fillna(comp_disc_popularity['MARK_STD'].dropna().mean())
+comp_disc_popularity['AGE'] = 2022-comp_disc_popularity['DATE_BIRTH'].astype(int)
+comp_disc_popularity = comp_disc_popularity.drop(['DATE_BIRTH'],axis=1)
+
+comp_disc_popularity_train = comp_disc_popularity[comp_disc_popularity['ST_YEAR']=='2018/2019'].drop(['ST_YEAR'],axis=1)
+comp_disc_popularity_test = comp_disc_popularity[comp_disc_popularity['ST_YEAR']=='2019/2020'].drop(['ST_YEAR'],axis=1)
+comp_disc_popularity_val = comp_disc_popularity[comp_disc_popularity['ST_YEAR']=='2020/2021'].drop(['ST_YEAR'],axis=1)
+
+train_dataset = train_dataset.merge(comp_disc_popularity_train,on=['DISC_ID', 'TYPE_NAME'],how='left')
+test_dataset = test_dataset.merge(comp_disc_popularity_test,on=['DISC_ID', 'TYPE_NAME'],how='left')
+
+#-----------------------------------------------------------------------------------------------------------------------
+print('preprocessing validation dataset...')
+
+isu_mark_history_val = train[train['ST_YEAR'].isin(['2020'])].groupby(by=['ISU', 'TYPE_NAME'])['DEBT'].agg({'median'})
+students_mark_history_val = train[train['ST_YEAR'].isin(['2020'])].groupby(by=['DISC_ID'])['DEBT'].agg({'mean','std'})
+isu_mark_history_val = isu_mark_history_val.reset_index().rename({'median':'debt_hist'},axis=1)
+students_mark_history_val = students_mark_history_val.reset_index().rename({'std':'students_debt_hist_std','mean':'students_debt_hist_mean'},axis=1)
+val_dataset = test[['ISU', 'ST_YEAR', 'DISC_ID', 'TYPE_NAME']].drop_duplicates()
+val_dataset = val_dataset.merge(students_mark_history_val,on=['DISC_ID'],how='left')
+val_dataset = val_dataset.merge(isu_mark_history_val,on=['ISU', 'TYPE_NAME'],how='left')
+val_dataset = val_dataset.merge(comp_disc_popularity_val,on=['DISC_ID', 'TYPE_NAME'],how='left')
+
+print('val_dataset  shape = ', val_dataset.shape)
+print(val_dataset.info())
+#-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
 

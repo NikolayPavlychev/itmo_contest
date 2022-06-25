@@ -56,3 +56,24 @@ print(classification_report(y_predict, test_dataset_ohe_form['DEBT']))
 y_predict =  clf.predict(train_dataset_ohe_form_drop_id_target)
 
 print(classification_report(y_predict, train_dataset_ohe_form['DEBT']))
+
+#submission
+
+val_dataset_ohe_form = joblib.load(ROOT_DIR + '/samples/' + 'val_ohe.pickle')
+
+val_dataset_ohe_form_drop_id_target = val_dataset_ohe_form.drop(['ISU', 'DISC_ID', 'TYPE_NAME'],axis=1)
+cols = list(val_dataset_ohe_form_drop_id_target.columns)
+
+for col in cols:
+    if pd.api.types.is_object_dtype(val_dataset_ohe_form_drop_id_target[col]):
+        val_dataset_ohe_form_drop_id_target[col] = val_dataset_ohe_form_drop_id_target[col].astype('int')
+
+y_val_predict =  clf.predict(val_dataset_ohe_form_drop_id_target)
+
+y_val_predict = pd.DataFrame(y_val_predict, columns=['DEBT'])
+submission = pd.concat((val_dataset_ohe_form[['ISU', 'DISC_ID', 'TYPE_NAME']], y_val_predict),axis=1)
+
+submission['ID'] = 'ISU:'+submission['ISU']+' | '+'DISC_ID:'+submission['DISC_ID']+' | '+'TYPE_NAME:'+submission['TYPE_NAME']
+submission = submission[['ID','DEBT']]
+
+submission.to_csv(ROOT_DIR + '/samples/' + 'submission_1.csv',sep=',',index=False)

@@ -5,11 +5,13 @@ import os
 import sys
 import random
 import time
+import joblib
 
 import numpy as np
 import scipy
 import pandas as pd
 import sklearn
+from sklearn.preprocessing import OneHotEncoder
 
 print('Successfully!')
 #-----------------------------------------------------------------------------------------------------------------------
@@ -200,10 +202,48 @@ val_dataset = val_dataset.merge(comp_disc_popularity_val,on=['DISC_ID', 'TYPE_NA
 
 print('val_dataset  shape = ', val_dataset.shape)
 print(val_dataset.info())
+
+comp_portrait = comp_portrait.rename({'GENDER':'STUDENT_GENDER'},axis=1)
+
+print(train_dataset.shape,train_dataset.shape,val_dataset.shape)
+train_dataset = train_dataset.merge(comp_portrait,on='ISU',how='left')
+test_dataset = test_dataset.merge(comp_portrait,on='ISU',how='left')
+val_dataset = val_dataset.merge(comp_portrait,on='ISU',how='left')
+print(train_dataset.shape,train_dataset.shape,val_dataset.shape)
+
+features_cols = ['ISU', 'DISC_ID', 'TYPE_NAME',
+       'students_debt_hist_std', 'students_debt_hist_mean', 'debt_hist',
+       'CHOICE', 'DISC_NAME', 'KEYWORD_NAMES', 'GENDER', 'MARK_STD',
+       'MARK_MEAN', 'AGE', 'STUDENT_GENDER', 'CITIZENSHIP', 'EXAM_TYPE',
+       'EXAM_SUBJECT_1', 'EXAM_SUBJECT_2', 'EXAM_SUBJECT_3', 'ADMITTED_EXAM_1',
+       'ADMITTED_EXAM_2', 'ADMITTED_EXAM_3', 'ADMITTED_SUBJECT_PRIZE_LEVEL',
+       'REGION_ID', 'DEBT']
+
+features_cols_val = ['ISU', 'DISC_ID', 'TYPE_NAME',
+       'students_debt_hist_std', 'students_debt_hist_mean', 'debt_hist',
+       'CHOICE', 'DISC_NAME', 'KEYWORD_NAMES', 'GENDER', 'MARK_STD',
+       'MARK_MEAN', 'AGE', 'STUDENT_GENDER', 'CITIZENSHIP', 'EXAM_TYPE',
+       'EXAM_SUBJECT_1', 'EXAM_SUBJECT_2', 'EXAM_SUBJECT_3', 'ADMITTED_EXAM_1',
+       'ADMITTED_EXAM_2', 'ADMITTED_EXAM_3', 'ADMITTED_SUBJECT_PRIZE_LEVEL',
+       'REGION_ID']
+
+train_dataset = train_dataset[features_cols]
+test_dataset = test_dataset[features_cols]
+val_dataset = val_dataset[features_cols_val]
+
+joblib.dump(train_dataset, ROOT_DIR + '/samples/' + 'train.pickle')
+joblib.dump(test_dataset, ROOT_DIR + '/samples/' + 'test.pickle')
+joblib.dump(val_dataset, ROOT_DIR + '/samples/' + 'val.pickle')
+
 #-----------------------------------------------------------------------------------------------------------------------
+print('OneHotEncode preprocessing of categorical features...')
 
+train_dataset = joblib.load(ROOT_DIR + '/samples/' + 'train.pickle')
+test_dataset = joblib.load(ROOT_DIR + '/samples/' + 'test.pickle')
+val_dataset = joblib.load(ROOT_DIR + '/samples/' + 'val.pickle')
 
+from OhePreprocessing import OhePreprocessing
 
-
-
+train_dataset_ohe_form, cat_dummies, train_cols_order = OhePreprocessing(dataset=train_dataset,target=True,train=True,
+                                                                         cat_dummies = None, train_cols_order = None)
 

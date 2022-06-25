@@ -115,7 +115,7 @@ comp_disc = comp_disc.rename(columns={'PLAN_ID':'MAIN_PLAN'})
 comp_disc_teachers = comp_disc.merge(comp_teachers,on=['MAIN_PLAN', 'DISC_ID'],how='outer')
 print('comp_disc_teachers shape = ',comp_disc_teachers.shape)
 
-
+print('Successfully!')
 #-----------------------------------------------------------------------------------------------------------------------
 print('Preparing target...')
 
@@ -188,6 +188,7 @@ comp_disc_popularity_val = comp_disc_popularity[comp_disc_popularity['ST_YEAR']=
 train_dataset = train_dataset.merge(comp_disc_popularity_train,on=['DISC_ID', 'TYPE_NAME'],how='left')
 test_dataset = test_dataset.merge(comp_disc_popularity_test,on=['DISC_ID', 'TYPE_NAME'],how='left')
 
+print('Successfully!')
 #-----------------------------------------------------------------------------------------------------------------------
 print('preprocessing validation dataset...')
 
@@ -235,6 +236,7 @@ joblib.dump(train_dataset, ROOT_DIR + '/samples/' + 'train.pickle')
 joblib.dump(test_dataset, ROOT_DIR + '/samples/' + 'test.pickle')
 joblib.dump(val_dataset, ROOT_DIR + '/samples/' + 'val.pickle')
 
+print('Successfully!')
 #-----------------------------------------------------------------------------------------------------------------------
 print('OneHotEncode preprocessing of categorical features...')
 
@@ -242,8 +244,23 @@ train_dataset = joblib.load(ROOT_DIR + '/samples/' + 'train.pickle')
 test_dataset = joblib.load(ROOT_DIR + '/samples/' + 'test.pickle')
 val_dataset = joblib.load(ROOT_DIR + '/samples/' + 'val.pickle')
 
+train_dataset = train_dataset.drop(['KEYWORD_NAMES','REGION_ID'],axis=1)
+test_dataset = test_dataset.drop(['KEYWORD_NAMES', 'REGION_ID'],axis=1)
+val_dataset = val_dataset.drop(['KEYWORD_NAMES', 'REGION_ID'],axis=1)
+
 from OhePreprocessing import OhePreprocessing
 
-train_dataset_ohe_form, cat_dummies, train_cols_order = OhePreprocessing(dataset=train_dataset,target=True,train=True,
+train_dataset_ohe_form, cat_dummies, train_cols_order = OhePreprocessing(dataset=train_dataset,target=True, train_bool=True,
                                                                          cat_dummies = None, train_cols_order = None)
+test_dataset_ohe_form = OhePreprocessing(dataset=test_dataset,target=True, train_bool=False,
+                                                                         cat_dummies = cat_dummies, train_cols_order = train_cols_order)
+val_dataset_ohe_form = OhePreprocessing(dataset=val_dataset,target=False, train_bool=False,
+                                                                         cat_dummies = cat_dummies, train_cols_order = train_cols_order)
+
+joblib.dump(train_dataset_ohe_form, ROOT_DIR + '/samples/' + 'train_ohe.pickle')
+joblib.dump(test_dataset_ohe_form, ROOT_DIR + '/samples/' + 'test_ohe.pickle')
+joblib.dump(val_dataset_ohe_form, ROOT_DIR + '/samples/' + 'val_ohe.pickle')
+
+print('Successfully!')
+#-----------------------------------------------------------------------------------------------------------------------
 

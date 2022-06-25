@@ -1,7 +1,8 @@
 #Function OnePreprocessing() convert dataset, contain categorical features and transform them into OHE form.
+
 import pandas as pd
 
-def OhePreprocessing(dataset, target=True, train=True, cat_dummies = None, train_cols_order = None):
+def OhePreprocessing(dataset, target=True, train_bool=True, cat_dummies = None, train_cols_order = None):
     cols=list(dataset.columns)
 
     if target:
@@ -16,14 +17,16 @@ def OhePreprocessing(dataset, target=True, train=True, cat_dummies = None, train
         cols.remove('DEBT')
 
     for col in cols:
-        if pd.api.types.is_object_dtype(dataset.col):
-            df = pd.get_dummies(dataset.col, prefix_sep="__",
-                              columns=dataset.col)
+        print(col)
+        if pd.api.types.is_object_dtype(dataset[col]):
+            df = pd.get_dummies(dataset[col], prefix=str(col), prefix_sep="__",
+                              columns=dataset[col])
         else:
-            df = pd.DataFrame(dataset.col)
-        dataset_ohe_form = pd.concat((dataset.col,df),axis=1)
+            df = pd.DataFrame(dataset[col])
+        dataset_ohe_form = pd.concat((dataset_ohe_form,df),axis=1)
 
-    if train:
+
+    if train_bool:
         cat_dummies = [col for col in dataset_ohe_form
                    if "__" in col
                    and col.split("__")[0] in cols]
@@ -40,9 +43,12 @@ def OhePreprocessing(dataset, target=True, train=True, cat_dummies = None, train
                 print("Adding missing feature {}".format(col))
                 dataset_ohe_form[col] = 0
 
-        dataset_ohe_form = dataset_ohe_form[train_cols_order]
+        if target:
+            dataset_ohe_form = dataset_ohe_form[train_cols_order]
+        else:
+            train_cols_order.remove('DEBT')
 
-    if train:
+    if train_bool:
         return dataset_ohe_form, cat_dummies, train_cols_order
     else:
         return dataset_ohe_form

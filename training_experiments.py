@@ -71,14 +71,18 @@ for col in float_features:
 from sklearn.linear_model import LogisticRegression
 
 train = pd.concat((train_dataset_ohe_form_drop_id_target,test_dataset_ohe_form_drop_id_target),axis=0)
+y_train = pd.concat((train_dataset_ohe_form['DEBT'],test_dataset_ohe_form['DEBT']),axis=0)
+train['DEBT'] = y_train
+
+train_permutation = train.sample(train.shape[0])
+
 # train = train_dataset_ohe_form_drop_id_target
 test = test_dataset_ohe_form_drop_id_target
-y_train = pd.concat((train_dataset_ohe_form['DEBT'],test_dataset_ohe_form['DEBT']),axis=0)
 # y_train = train_dataset_ohe_form['DEBT']
 y_test = test_dataset_ohe_form['DEBT']
 
 model = LogisticRegression(class_weight='balanced',C=0.1, penalty='l2', max_iter=300, n_jobs=-1)
-model.fit(train, y_train)
+model.fit(train_permutation.drop(['DEBT'],axis=1), train_permutation['DEBT'])
 preds_test =  model.predict(test_dataset_ohe_form_drop_id_target)
 
 print('f1 score', f1_score(y_test, preds_test))
@@ -86,15 +90,14 @@ print('accuracy score', accuracy_score(y_test, preds_test))
 print('precision score', precision_score(y_test, preds_test))
 print('recall score', recall_score(y_test, preds_test))
 
-preds_train =  model.predict(train_dataset_ohe_form_drop_id_target)
-y_train = train_dataset_ohe_form['DEBT']
-
+preds_train =  model.predict(train_permutation.drop(['DEBT'],axis=1))
+y_train = np.array(train_permutation['DEBT'].values)
 print('f1 score', f1_score(y_train, preds_train))
 print('accuracy score', accuracy_score(y_train, preds_train))
 print('precision score', precision_score(y_train, preds_train))
 print('recall score', recall_score(y_train, preds_train))
 
-joblib.dump(model,'./samples/LogReg_best.pickle')
+joblib.dump(model,'./samples/LogReg_best2.pickle')
 
 
 from sklearn.ensemble import GradientBoostingClassifier
@@ -184,10 +187,11 @@ submit_2 = test.merge(submission, on=['ISU', 'DISC_ID', 'TYPE_NAME'],how='inner'
 # submit_2['ID'] = 'ISU:'+submit_2['ISU']+' | '+'DISC_ID:'+submit_2['DISC_ID']+' | '+'TYPE_NAME:'+submit_2['TYPE_NAME']
 submit_2 = submit_2[['ID','DEBT']]
 
-submit_2.to_csv(ROOT_DIR + '/samples/' + 'submit_4_lr_best.csv',sep=',',index=False)
+submit_2.to_csv(ROOT_DIR + '/samples/' + 'submit_4_lr_best2.csv',sep=',',index=False)
+
+submit_4_lr_best = pd.read_csv(ROOT_DIR + '/samples/' + 'submit_4_lr_best.csv',sep=',',dtype=object)
 
 
-
-3. скачать заново все данные
+#3. скачать заново все данные
 
 

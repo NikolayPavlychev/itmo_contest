@@ -6,11 +6,13 @@ def OhePreprocessing(dataset, target=True, train_bool=True, cat_dummies = None, 
     cols=list(dataset.columns)
 
     if target:
-        dataset_ohe_form = dataset[['ISU', 'DISC_ID', 'TYPE_NAME','DEBT']]
+        dataset_ohe_form = dataset[['ISU', 'ST_YEAR', 'SEMESTER', 'DISC_ID', 'TYPE_NAME','DEBT']]
     else:
-        dataset_ohe_form = dataset[['ISU', 'DISC_ID', 'TYPE_NAME']]
+        dataset_ohe_form = dataset[['ISU', 'ST_YEAR', 'SEMESTER', 'DISC_ID', 'TYPE_NAME']]
 
     cols.remove('ISU')
+    cols.remove('ST_YEAR')
+    cols.remove('SEMESTER')
     cols.remove('DISC_ID')
     cols.remove('TYPE_NAME')
     if 'DEBT' in cols:
@@ -48,7 +50,8 @@ def OhePreprocessing(dataset, target=True, train_bool=True, cat_dummies = None, 
         else:
             train_cols_order.remove('DEBT')
 
+
     if train_bool:
         return dataset_ohe_form, cat_dummies, train_cols_order
     else:
-        return dataset_ohe_form
+        return dataset_ohe_form[train_cols_order]

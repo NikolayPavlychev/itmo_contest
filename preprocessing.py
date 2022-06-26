@@ -35,7 +35,7 @@ comp_disc = pd.read_csv(ROOT_DIR + '/data/' + 'comp_disc.csv', dtype=object,sep=
 cols_comp_teachers = ['ISU', 'GENDER', 'DATE_BIRTH', 'ST_YEAR', 'SEMESTER', 'DISC_ID', 'MAIN_PLAN', 'TYPE_NAME', 'MARK']
 comp_teachers = pd.read_csv(ROOT_DIR + '/data/' + 'comp_teachers.csv', dtype=object,sep=',', header=1, names=cols_comp_teachers)
 
-cols_train = ['ISU', 'ST_YEAR','SEMESTER', 'DISC_ID', 'TYPE_NAME', 'MARK', 'DEBT']
+cols_train = ['ISU', 'ST_YEAR','SEMESTER', 'DISC_ID', 'TYPE_NAME',  'DEBT']
 train = pd.read_csv(ROOT_DIR + '/samples/' + 'train.csv', dtype=object,sep=',', header=1, names=cols_train)
 
 cols_test = ['ISU', 'ST_YEAR', 'SEMESTER', 'DISC_ID', 'TYPE_NAME']

@@ -189,19 +189,19 @@ train_dataset = train_dataset[train_dataset['ST_YEAR'].isin(['2018','2019'])]
 # print(test_dataset.info())
 #
 # train_dataset['debt_hist'] = train_dataset['debt_hist'].fillna(value=train_dataset['debt_hist'].median())
-# train_dataset['students_debt_hist_std'] = train_dataset['students_debt_hist_std'].fillna(value=train_dataset['students_debt_hist_std'].mean())
-# train_dataset['students_debt_hist_mean'] = train_dataset['students_debt_hist_mean'].fillna(value=train_dataset['students_debt_hist_mean'].mean())
+# train_dataset['students_debt_hist_std'] = train_dataset['students_debt_hist_std'].fillna(value=train_dataset['students_debt_hist_std'].median())
+# train_dataset['students_debt_hist_mean'] = train_dataset['students_debt_hist_mean'].fillna(value=train_dataset['students_debt_hist_mean'].median())
 #
 # test_dataset['debt_hist'] = test_dataset['debt_hist'].fillna(value=test_dataset['debt_hist'].median())
-# test_dataset['students_debt_hist_std'] = test_dataset['students_debt_hist_std'].fillna(value=test_dataset['students_debt_hist_std'].mean())
-# test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'].fillna(value=test_dataset['students_debt_hist_mean'].mean())
+# test_dataset['students_debt_hist_std'] = test_dataset['students_debt_hist_std'].fillna(value=test_dataset['students_debt_hist_std'].median())
+# test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'].fillna(value=test_dataset['students_debt_hist_mean'].median())
 
 cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
        'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
 
 for col in cols_agg:
-    train_dataset[col] = train_dataset[col].fillna(value=train_dataset[col].mean())
-    test_dataset[col] = test_dataset[col].fillna(value=test_dataset[col].mean())
+    train_dataset[col] = train_dataset[col].fillna(value=train_dataset[col].median())
+    test_dataset[col] = test_dataset[col].fillna(value=test_dataset[col].median())
 
 print('comp_disc_teachers table:')
 print('Check duplicates by DISC_ID:')
@@ -230,7 +230,7 @@ comp_disc_popularity.columns = comp_disc_popularity.columns.droplevel(1)
 comp_disc_popularity.columns.values[10] = "MARK_MEAN"
 comp_disc_popularity.columns.values[9] = "MARK_STD"
 
-comp_disc_popularity['MARK_STD'] = comp_disc_popularity['MARK_STD'].fillna(comp_disc_popularity['MARK_STD'].dropna().mean())
+comp_disc_popularity['MARK_STD'] = comp_disc_popularity['MARK_STD'].fillna(comp_disc_popularity['MARK_STD'].dropna().median())
 comp_disc_popularity['AGE'] = 2022-comp_disc_popularity['DATE_BIRTH'].astype(int)
 comp_disc_popularity = comp_disc_popularity.drop(['DATE_BIRTH'],axis=1)
 
@@ -289,8 +289,8 @@ cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
        'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
 
 for col in cols_agg:
-    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
-    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
+    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].median())
+    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].median())
 
 val_dataset = val_dataset.merge(comp_disc_popularity_val,on=['DISC_ID', 'TYPE_NAME'],how='left')
 
@@ -374,9 +374,9 @@ val_dataset_ohe_form = OhePreprocessing(dataset=val_dataset,target=False, train_
 cols_agg = ['MARK_STD', 'MARK_MEAN', 'AGE', 'CHOICE', 'ADMITTED_EXAM_1', 'ADMITTED_EXAM_2', 'ADMITTED_EXAM_3']
 
 for col in cols_agg:
-    train_dataset_ohe_form[col] = train_dataset_ohe_form[col].fillna(value=train_dataset_ohe_form[col].mean())
-    test_dataset_ohe_form[col] = test_dataset_ohe_form[col].fillna(value=test_dataset_ohe_form[col].mean())
-    val_dataset_ohe_form[col] = val_dataset_ohe_form[col].fillna(value=val_dataset_ohe_form[col].mean())
+    train_dataset_ohe_form[col] = train_dataset_ohe_form[col].fillna(value=train_dataset_ohe_form[col].median())
+    test_dataset_ohe_form[col] = test_dataset_ohe_form[col].fillna(value=test_dataset_ohe_form[col].median())
+    val_dataset_ohe_form[col] = val_dataset_ohe_form[col].fillna(value=val_dataset_ohe_form[col].median())
 
 
 joblib.dump(train_dataset_ohe_form, ROOT_DIR + '/samples/' + 'train_ohe.pickle')

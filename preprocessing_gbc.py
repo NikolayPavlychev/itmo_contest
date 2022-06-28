@@ -196,12 +196,12 @@ train_dataset = train_dataset[train_dataset['ST_YEAR'].isin(['2018','2019'])]
 # test_dataset['students_debt_hist_std'] = test_dataset['students_debt_hist_std'].fillna(value=test_dataset['students_debt_hist_std'].mean())
 # test_dataset['students_debt_hist_mean'] = test_dataset['students_debt_hist_mean'].fillna(value=test_dataset['students_debt_hist_mean'].mean())
 
-cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
-       'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
-
-for col in cols_agg:
-    train_dataset[col] = train_dataset[col].fillna(value=train_dataset[col].mean())
-    test_dataset[col] = test_dataset[col].fillna(value=test_dataset[col].mean())
+# cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
+#        'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
+#
+# for col in cols_agg:
+#     train_dataset[col] = train_dataset[col].fillna(value=train_dataset[col].mean())
+#     test_dataset[col] = test_dataset[col].fillna(value=test_dataset[col].mean())
 
 print('comp_disc_teachers table:')
 print('Check duplicates by DISC_ID:')
@@ -285,12 +285,12 @@ all_disc_df_test = pd.concat(all_disc_df_test)
 val_dataset = test.merge(all_st_df_test, on=['ISU', 'SEMESTER', 'ST_YEAR', 'TYPE_NAME'], how='left')
 val_dataset = val_dataset.merge(all_disc_df_test, on=['DISC_ID', 'SEMESTER', 'ST_YEAR', 'TYPE_NAME'], how='left')
 
-cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
-       'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
-
-for col in cols_agg:
-    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
-    val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
+# cols_agg = ['DEBT_MEAN', 'DEBT_SUM', 'DEBT_COUNT', 'DISC_DEBT_MEAN',
+#        'DISC_DEBT_SUM', 'DISC_DEBT_COUNT']
+#
+# for col in cols_agg:
+#     val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
+#     val_dataset[col] = val_dataset[col].fillna(value=val_dataset[col].mean())
 
 val_dataset = val_dataset.merge(comp_disc_popularity_val,on=['DISC_ID', 'TYPE_NAME'],how='left')
 
@@ -371,17 +371,17 @@ val_dataset_ohe_form = OhePreprocessing(dataset=val_dataset,target=False, train_
                                                                          cat_dummies = cat_dummies, train_cols_order = train_cols_order)
 
 
-cols_agg = ['MARK_STD', 'MARK_MEAN', 'AGE', 'CHOICE', 'ADMITTED_EXAM_1', 'ADMITTED_EXAM_2', 'ADMITTED_EXAM_3']
+# cols_agg = ['MARK_STD', 'MARK_MEAN', 'AGE', 'CHOICE', 'ADMITTED_EXAM_1', 'ADMITTED_EXAM_2', 'ADMITTED_EXAM_3']
+#
+# for col in cols_agg:
+#     train_dataset_ohe_form[col] = train_dataset_ohe_form[col].fillna(value=train_dataset_ohe_form[col].mean())
+#     test_dataset_ohe_form[col] = test_dataset_ohe_form[col].fillna(value=test_dataset_ohe_form[col].mean())
+#     val_dataset_ohe_form[col] = val_dataset_ohe_form[col].fillna(value=val_dataset_ohe_form[col].mean())
 
-for col in cols_agg:
-    train_dataset_ohe_form[col] = train_dataset_ohe_form[col].fillna(value=train_dataset_ohe_form[col].mean())
-    test_dataset_ohe_form[col] = test_dataset_ohe_form[col].fillna(value=test_dataset_ohe_form[col].mean())
-    val_dataset_ohe_form[col] = val_dataset_ohe_form[col].fillna(value=val_dataset_ohe_form[col].mean())
 
-
-joblib.dump(train_dataset_ohe_form, ROOT_DIR + '/samples/' + 'train_ohe.pickle')
-joblib.dump(test_dataset_ohe_form, ROOT_DIR + '/samples/' + 'test_ohe.pickle')
-joblib.dump(val_dataset_ohe_form, ROOT_DIR + '/samples/' + 'val_ohe.pickle')
+joblib.dump(train_dataset_ohe_form, ROOT_DIR + '/samples/' + 'train_ohe_gbc.pickle')
+joblib.dump(test_dataset_ohe_form, ROOT_DIR + '/samples/' + 'test_ohe_gbc.pickle')
+joblib.dump(val_dataset_ohe_form, ROOT_DIR + '/samples/' + 'val_ohe_gbc.pickle')
 
 print('Successfully!')
 #-----------------------------------------------------------------------------------------------------------------------

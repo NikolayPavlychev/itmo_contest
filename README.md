@@ -1,2 +1,2 @@
-# itmo_contest
-ITMO contest for master degree program
+# Repository of ITMO contest for earn master degree program
+created and managed by Nikolay Pavlychev
